@@ -9,3 +9,5 @@ email-validator==2.1.0.post1
 aiosqlite==0.20.0
 pydantic==2.6.1
 python-multipart==0.0.9
+bcrypt
+passlib
