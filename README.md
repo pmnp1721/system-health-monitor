@@ -72,7 +72,7 @@ SLACK_WEBHOOK_URL=your-slack-webhook-url
 
 1. Start the FastAPI server:
 ```bash
-uvicorn main:app --reload
+uvicorn src.main:app --reload
 ```
 
 2. Access the API documentation:
