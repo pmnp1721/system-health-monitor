@@ -26,12 +26,12 @@ A local system health monitoring tool built with FastAPI that collects real-time
 - `GET /api/alerts` - Get all alerts
 - `PUT /api/alerts/{alert_id}/resolve` - Resolve specific alert
 - `POST /api/test-notification` - Test Slack notification system
-
+### Notification testing
+- `POST /api/test-notification ` - for testing the slack notification
 #### Authentication
 - `POST /api/register` - For registering as user
 - `POST /api/login` - For login as user
-####
-- `POST /api/test-notification ` - for testing the slack notification
+
 ## Technical Stack
 
 - **Backend Framework**: FastAPI
@@ -62,7 +62,6 @@ pip install -r requirements.txt
 4. Create `.env` file with configuration:
 ```env
 DATABASE_URL=sqlite:///./monitoring.db
-API_KEY=your-api-key-here
 CPU_THRESHOLD=80
 MEMORY_THRESHOLD=85
 DISK_THRESHOLD=90
@@ -123,6 +122,4 @@ In the development of this project, the following AI tools were utilized:
 ##live API endpoint URL
 https://system-health-monitor-2.onrender.com/docs
 
-##LLM used
-Chatgpt
 
