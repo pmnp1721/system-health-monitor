@@ -10,7 +10,7 @@ A local system health monitoring tool built with FastAPI that collects real-time
 - Configurable alert thresholds
 - Historical metrics tracking
 - Slack notifications for alerts
-
+- User Authentication
 ### API Endpoints
 
 #### System Metrics
