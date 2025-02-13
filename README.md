@@ -44,7 +44,7 @@ A local system health monitoring tool built with FastAPI that collects real-time
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone [https://github.com/pmnp1721/system-health-monitor]
 cd system-health-monitor
 ```
 
@@ -112,14 +112,13 @@ system-health-monitor
 
 ## Deployment
 
-The application is deployed on Railway platform. Live API endpoint: [Your-Railway-URL]
+The application is deployed on Render platform. Live API endpoint: [https://system-health-monitor-2.onrender.com/docs]
 
 ## Tools Used
 
 In the development of this project, the following AI tools were utilized:
 - Chatgpt(LLM): For assistance with development 
 
-##live API endpoint URL
-https://system-health-monitor-2.onrender.com/docs
+
 
 
