@@ -120,4 +120,9 @@ The application is deployed on Railway platform. Live API endpoint: [Your-Railwa
 In the development of this project, the following AI tools were utilized:
 - Chatgpt(LLM): For assistance with development 
 
+##live API endpoint URL
+https://system-health-monitor-2.onrender.com/docs
+
+##LLM used
+Chatgpt
 
