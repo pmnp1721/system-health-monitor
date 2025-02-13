@@ -27,6 +27,11 @@ A local system health monitoring tool built with FastAPI that collects real-time
 - `PUT /api/alerts/{alert_id}/resolve` - Resolve specific alert
 - `POST /api/test-notification` - Test Slack notification system
 
+#### Authentication
+- `POST /api/register` - For registering as user
+- `POST /api/login` - For login as user
+####
+- `POST /api/test-notification ` - for testing the slack notification
 ## Technical Stack
 
 - **Backend Framework**: FastAPI
@@ -73,45 +78,9 @@ uvicorn main:app --reload
 
 2. Access the API documentation:
 - Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
 
-## Testing the Application
 
-The project includes a test script (`test_api.py`) to verify all API endpoints and functionality.
 
-### Running the Test Script
-
-1. Make sure the FastAPI server is running
-
-2. Run the test script:
-```bash
-python test_api.py
-```
-
-The test script will:
-- Test all API endpoints
-- Verify authentication
-- Check system metrics collection
-- Test metadata operations
-- Verify alert functionality
-- Test notification system
-- Optionally monitor the system for 5 minutes
-
-### Example Test Code
-```python
-import requests
-
-# Configuration
-headers = {"X-API-Key": "your-api-key"}
-
-# Test current metrics
-response = requests.get("http://localhost:8000/api/metrics", headers=headers)
-print(response.json())
-
-# Test notification system
-response = requests.post("http://localhost:8000/api/test-notification", headers=headers)
-print(response.json())
-```
 
 ## Project Structure
 ```

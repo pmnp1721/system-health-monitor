@@ -19,6 +19,16 @@ metadata_table = Table(
     Column("environment", String(50)),
     Column("location", String(100)),
 )
+users_table = Table(
+    "users",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("email", String, unique=True),
+    Column("username", String),
+    Column("password_hash", String),
+    Column("api_key", String, unique=True),
+    Column("created_at", DateTime)
+)
 
 alerts_table = Table(
     "alerts",

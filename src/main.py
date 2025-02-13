@@ -6,15 +6,35 @@ from datetime import datetime, timedelta
 import psutil
 import asyncio
 import requests
-from .database import database, metadata_table, alerts_table, metrics_history_table
-from sqlalchemy import create_engine, select, and_
-from pydantic import BaseModel, validator
+from .database import database, metadata_table, alerts_table, metrics_history_table,users_table
+from sqlalchemy import create_engine, select, and_,Table, Column, Integer, String, DateTime
+from pydantic import BaseModel, validator,EmailStr
 import os
 from dotenv import load_dotenv
+import uuid
+from passlib.context import CryptContext
 
 load_dotenv()
 
 # Models for request validation
+class UserBase(BaseModel):
+    email: EmailStr
+    username: str
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    api_key: str
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 class MetadataUpdate(BaseModel):
     """
     Model for metadata updates with validation
@@ -56,8 +76,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def generate_api_key() -> str:
+    return str(uuid.uuid4())
+
 # Configuration
-API_KEY = os.getenv("API_KEY", "1234")
+
 CPU_THRESHOLD = float(os.getenv("CPU_THRESHOLD", "80"))
 MEMORY_THRESHOLD = float(os.getenv("MEMORY_THRESHOLD", "85"))
 DISK_THRESHOLD = float(os.getenv("DISK_THRESHOLD", "90"))
@@ -66,11 +97,13 @@ SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 # Authentication
 api_key_header = APIKeyHeader(name="X-API-Key")
 
+# verify_api_key function
 async def verify_api_key(api_key: str = Depends(api_key_header)):
-    """
-    Verify the API key provided in the request header
-    """
-    if api_key != API_KEY:
+    """Verify the API key against registered users"""
+    query = users_table.select().where(users_table.c.api_key == api_key)
+    user = await database.fetch_one(query)
+    
+    if not user:
         raise HTTPException(
             status_code=401,
             detail="Invalid API key"
@@ -433,3 +466,47 @@ async def test_notification(api_key: str = Depends(verify_api_key)):
     }
     await send_slack_alert(test_alert)
     return {"message": "Test notification sent"}
+
+
+@app.post("/api/register", response_model=User)
+async def register_user(user: UserCreate):
+    """Register a new user and return their API key"""
+    # Check if user already exists
+    query = users_table.select().where(users_table.c.email == user.email)
+    existing_user = await database.fetch_one(query)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user with hashed password and API key
+    api_key = generate_api_key()
+    query = users_table.insert().values(
+        email=user.email,
+        username=user.username,
+        password_hash=get_password_hash(user.password),
+        api_key=api_key,
+        created_at=datetime.utcnow()
+    )
+    user_id = await database.execute(query)
+    
+    return {
+        "id": user_id,
+        "email": user.email,
+        "username": user.username,
+        "api_key": api_key,
+        "created_at": datetime.utcnow()
+    }
+
+@app.post("/api/login")
+async def login_user(user: UserLogin):
+    """Login user and return their API key"""
+    query = users_table.select().where(users_table.c.email == user.email)
+    db_user = await database.fetch_one(query)
+    
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if not verify_password(user.password, db_user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    return {"api_key": db_user.api_key}
+
